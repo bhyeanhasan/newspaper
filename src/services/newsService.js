@@ -89,6 +89,47 @@ export function formatTimeAgo(dateString, lang = 'bn') {
   }
 }
 
+// Helper: clean and sanitize news summary from RSS description
+export function cleanNewsSummary(rawDesc = '', title = '', sourceName = '', region = 'bd') {
+  const cleanTitle = (title || '').trim();
+  const cleanSource = (sourceName || '').trim();
+
+  if (!rawDesc) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল পত্রিকায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full report directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  // Check if it is a Google News RSS pseudo-description (contains <ol> or multiple article links)
+  const isGoogleNewsLinks = /&lt;ol&gt;|<ol>|&lt;font|<font|Google News/i.test(rawDesc);
+  if (isGoogleNewsLinks) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল প্রকাশনায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full verified coverage directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  // Decode standard HTML entities
+  let text = rawDesc
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ');
+
+  // Remove HTML tags
+  text = text.replace(/<[^>]+>/g, ' ');
+  text = text.replace(/\s+/g, ' ').trim();
+
+  if (!text || text.length < 25) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল পত্রিকায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full report directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  return text;
+}
+
 // Parse standard RSS XML in browser
 function parseRssXml(xmlText, region = 'bd') {
   const parser = new DOMParser();
@@ -120,15 +161,9 @@ function parseRssXml(xmlText, region = 'bd') {
     const pubDateStr = item.querySelector('pubDate')?.textContent?.trim() || '';
     const pubDate = pubDateStr ? new Date(pubDateStr).toISOString() : new Date().toISOString();
 
-    // Description text cleanup
+    // Description text cleanup using cleanNewsSummary
     let rawDesc = item.querySelector('description')?.textContent || '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = rawDesc;
-    let cleanDesc = tempDiv.textContent || tempDiv.innerText || '';
-    cleanDesc = cleanDesc.replace(/&nbsp;/g, ' ').trim();
-    if (!cleanDesc || cleanDesc.length < 20) {
-      cleanDesc = `${title}. সংবাদটির বিস্তারিত সরাসরি মূল প্রকাশনায় পড়ুন।`;
-    }
+    let cleanDesc = cleanNewsSummary(rawDesc, title, sourceName, region);
 
     // Media thumbnail if present
     const mediaThumb = item.getElementsByTagNameNS('*', 'thumbnail')?.[0]?.getAttribute('url');
@@ -201,6 +236,8 @@ export async function fetchLiveBangladeshNews() {
       if (Array.isArray(news) && news.length > 0) {
         return news.map(item => ({
           ...item,
+          summary: cleanNewsSummary(item.summary, item.title, item.source, 'bd'),
+          summaryEn: cleanNewsSummary(item.summaryEn || item.summary, item.titleEn || item.title, item.sourceEn || item.source, 'bd'),
           time: formatTimeAgo(item.pubDate, 'bn'),
           timeEn: formatTimeAgo(item.pubDate, 'en')
         }));
@@ -247,6 +284,8 @@ export async function fetchLiveInternationalNews() {
       if (Array.isArray(news) && news.length > 0) {
         return news.map(item => ({
           ...item,
+          summary: cleanNewsSummary(item.summary, item.title, item.source, 'int'),
+          summaryEn: cleanNewsSummary(item.summaryEn || item.summary, item.titleEn || item.title, item.sourceEn || item.source, 'int'),
           time: formatTimeAgo(item.pubDate, 'bn'),
           timeEn: formatTimeAgo(item.pubDate, 'en')
         }));

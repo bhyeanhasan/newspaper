@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { X, ExternalLink, Bookmark, Share2, Clock, Globe, ShieldCheck } from 'lucide-react';
-import { formatTimeAgo } from '../services/newsService';
+import { formatTimeAgo, cleanNewsSummary } from '../services/newsService';
 
 export default function NewsModal({ 
   news, 
@@ -23,8 +23,9 @@ export default function NewsModal({
 
   const title = lang === 'bn' ? news.title : (news.titleEn || news.title);
   const altTitle = lang === 'bn' ? news.titleEn : news.title;
-  const summary = lang === 'bn' ? news.summary : (news.summaryEn || news.summary);
   const source = lang === 'bn' ? news.source : (news.sourceEn || news.source);
+  const rawSummary = lang === 'bn' ? news.summary : (news.summaryEn || news.summary);
+  const summary = cleanNewsSummary(rawSummary, title, source, news.region || 'bd');
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

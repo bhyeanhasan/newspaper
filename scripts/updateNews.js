@@ -59,6 +59,46 @@ function detectCategory(text = '') {
   return { tag: 'national', labelBn: 'জাতীয় ও সাধারণ (General)', labelEn: 'General News' };
 }
 
+function cleanNewsSummary(rawDesc = '', title = '', sourceName = '', region = 'bd') {
+  const cleanTitle = (title || '').trim();
+  const cleanSource = (sourceName || '').trim();
+
+  if (!rawDesc) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল পত্রিকায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full report directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  // Check if it is a Google News RSS pseudo-description (contains <ol> or multiple article links)
+  const isGoogleNewsLinks = /&lt;ol&gt;|<ol>|&lt;font|<font|Google News/i.test(rawDesc);
+  if (isGoogleNewsLinks) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল প্রকাশনায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full verified coverage directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  // Decode standard HTML entities
+  let text = rawDesc
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ');
+
+  // Remove HTML tags
+  text = text.replace(/<[^>]+>/g, ' ');
+  text = text.replace(/\s+/g, ' ').trim();
+
+  if (!text || text.length < 25) {
+    return region === 'bd'
+      ? `${cleanTitle}। বিস্তারিত প্রতিবেদন ও সর্বশেষ তথ্য সরাসরি ${cleanSource || 'মূল পত্রিকায়'} পড়ুন।`
+      : `${cleanTitle}. Read the full report directly on ${cleanSource || 'the publisher website'}.`;
+  }
+
+  return text;
+}
+
 function parseItems(xmlText, region = 'bd') {
   const items = [];
   const itemMatches = [...xmlText.matchAll(/<item>([\s\S]*?)<\/item>/g)];
@@ -87,12 +127,10 @@ function parseItems(xmlText, region = 'bd') {
       title = title.substring(0, lastHyphen).trim();
     }
 
-    // Description
+    // Clean and sanitize description
     const descMatch = raw.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/);
-    let desc = descMatch ? descMatch[1].replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim() : '';
-    if (!desc || desc.length < 20) {
-      desc = `${title}. সংবাদটির বিস্তারিত সরাসরি মূল প্রকাশনায় পড়ুন।`;
-    }
+    const rawDesc = descMatch ? descMatch[1] : '';
+    const desc = cleanNewsSummary(rawDesc, title, sourceName, region);
 
     // Thumbnail from media:thumbnail if available
     const mediaThumbMatch = raw.match(/<media:thumbnail[^>]*url="([^"]*)"/);

@@ -10,7 +10,7 @@ import {
   Radio,
   Sparkles
 } from 'lucide-react';
-import { formatTimeAgo } from '../services/newsService';
+import { formatTimeAgo, cleanNewsSummary } from '../services/newsService';
 
 export default function HotNewsSection({ 
   bdHotNews, 
@@ -214,7 +214,12 @@ export default function HotNewsSection({
                   </h3>
 
                   <p className="lead-summary">
-                    {lang === 'bn' ? leadStory.summary : (leadStory.summaryEn || leadStory.summary)}
+                    {cleanNewsSummary(
+                      lang === 'bn' ? leadStory.summary : (leadStory.summaryEn || leadStory.summary),
+                      lang === 'bn' ? leadStory.title : (leadStory.titleEn || leadStory.title),
+                      lang === 'bn' ? leadStory.source : (leadStory.sourceEn || leadStory.source),
+                      leadStory.region || 'bd'
+                    )}
                   </p>
                 </div>
 
@@ -264,8 +269,9 @@ export default function HotNewsSection({
           {otherStories.map((story) => {
             const isBookmarked = bookmarkedIds.includes(story.id);
             const title = lang === 'bn' ? story.title : (story.titleEn || story.title);
-            const summary = lang === 'bn' ? story.summary : (story.summaryEn || story.summary);
             const source = lang === 'bn' ? story.source : (story.sourceEn || story.source);
+            const rawSummary = lang === 'bn' ? story.summary : (story.summaryEn || story.summary);
+            const summary = cleanNewsSummary(rawSummary, title, source, story.region || 'bd');
             const timeAgo = getTimeDisplay(story);
 
             return (
