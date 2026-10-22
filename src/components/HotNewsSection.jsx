@@ -179,27 +179,10 @@ export default function HotNewsSection({
         </div>
       ) : (
         <div className="news-grid">
-          {/* Big Featured Lead Story */}
+          {/* Big Featured Lead Story - Minimalistic without generic images */}
           {leadStory && (
-            <article className="hot-lead-card">
-              <div className="lead-image-wrap">
-                <img 
-                  src={leadStory.imageUrl} 
-                  alt={lang === 'bn' ? leadStory.title : (leadStory.titleEn || leadStory.title)}
-                  className="lead-image"
-                  loading="lazy"
-                />
-                <div className="lead-badge-float">
-                  <Flame size={14} />
-                  <span>
-                    {leadStory.isBreaking 
-                      ? (lang === 'bn' ? 'তাজা ব্রেকিং' : 'RECENT BREAKING') 
-                      : (lang === 'bn' ? 'শীর্ষ খবর' : 'TOP STORY')}
-                  </span>
-                </div>
-              </div>
-
-              <div className="lead-content">
+            <article className="hot-lead-card minimal">
+              <div className="lead-content full-width">
                 <div>
                   <div className="meta-row">
                     <span className="source-pill">
@@ -209,8 +192,16 @@ export default function HotNewsSection({
                       <Clock size={13} />
                       {getTimeDisplay(leadStory)}
                     </span>
-                    <span>• {leadStory.readTime || '3 min read'}</span>
-                    <span style={{ marginLeft: 'auto', fontWeight: 600, color: leadStory.region === 'bd' ? '#059669' : '#2563eb' }}>
+                    {leadStory.isBreaking && (
+                      <span className="breaking-chip">
+                        <Flame size={12} />
+                        <span>{lang === 'bn' ? 'তাজা ব্রেকিং' : 'BREAKING'}</span>
+                      </span>
+                    )}
+                    <span className="category-pill-sm">
+                      {lang === 'bn' ? leadStory.category : (leadStory.categoryEn || leadStory.category)}
+                    </span>
+                    <span style={{ marginLeft: 'auto', fontWeight: 600, fontSize: '0.82rem', color: leadStory.region === 'bd' ? '#059669' : '#2563eb' }}>
                       {leadStory.region === 'bd' ? '🇧🇩 Bangladesh' : '🌍 International'}
                     </span>
                   </div>
@@ -229,23 +220,23 @@ export default function HotNewsSection({
 
                 <div className="card-footer-actions">
                   <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-                    <button 
-                      className="read-btn"
-                      onClick={() => onOpenModal(leadStory)}
-                    >
-                      <Eye size={16} />
-                      <span>{lang === 'bn' ? 'বিস্তারিত দেখুন' : 'Quick Preview'}</span>
-                    </button>
                     <a 
                       href={leadStory.newsUrl || leadStory.sourceUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="read-btn secondary"
+                      className="read-btn"
                       title="Open full news article on newspaper website"
                     >
                       <ExternalLink size={15} />
-                      <span>{lang === 'bn' ? 'মূল পত্রিকায় পড়ুন' : 'Read at Source'}</span>
+                      <span>{lang === 'bn' ? 'মূল পত্রিকায় সম্পূর্ণ পড়ুন' : 'Read at Source'}</span>
                     </a>
+                    <button 
+                      className="read-btn secondary"
+                      onClick={() => onOpenModal(leadStory)}
+                    >
+                      <Eye size={15} />
+                      <span>{lang === 'bn' ? 'বিস্তারিত প্রিভিউ' : 'Quick Preview'}</span>
+                    </button>
                   </div>
 
                   <div className="action-icon-group">
@@ -269,7 +260,7 @@ export default function HotNewsSection({
             </article>
           )}
 
-          {/* Secondary Hot Stories */}
+          {/* Secondary Hot Stories - Minimalistic without generic images */}
           {otherStories.map((story) => {
             const isBookmarked = bookmarkedIds.includes(story.id);
             const title = lang === 'bn' ? story.title : (story.titleEn || story.title);
@@ -278,28 +269,20 @@ export default function HotNewsSection({
             const timeAgo = getTimeDisplay(story);
 
             return (
-              <article key={story.id} className="hot-news-card">
-                <div className="news-card-img-wrap">
-                  <img 
-                    src={story.imageUrl} 
-                    alt={title}
-                    className="news-card-img"
-                    loading="lazy"
-                  />
-                  {story.isBreaking && (
-                    <div className="breaking-flag">
-                      {lang === 'bn' ? 'ব্রেকিং' : 'RECENT'}
-                    </div>
-                  )}
-                </div>
-
-                <div className="news-card-body">
+              <article key={story.id} className="hot-news-card minimal">
+                <div className="news-card-body minimal">
                   <div className="meta-row">
                     <span className="source-pill">{source}</span>
                     <span className="utility-item">
                       <Clock size={12} />
                       {timeAgo}
                     </span>
+                    {story.isBreaking && (
+                      <span className="breaking-chip sm">
+                        <Flame size={11} />
+                        <span>{lang === 'bn' ? 'ব্রেকিং' : 'RECENT'}</span>
+                      </span>
+                    )}
                   </div>
 
                   <h4 
@@ -314,37 +297,40 @@ export default function HotNewsSection({
                   </p>
 
                   <div className="card-footer-actions">
-                    <button 
-                      className="read-btn secondary"
-                      onClick={() => onOpenModal(story)}
-                    >
-                      <Eye size={15} />
-                      <span>{lang === 'bn' ? 'বিস্তারিত' : 'Preview'}</span>
-                    </button>
-
-                    <div className="action-icon-group">
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <a 
                         href={story.newsUrl || story.sourceUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="small-icon-btn"
+                        className="read-btn sm"
                         title="Read direct news article on source website"
                       >
-                        <ExternalLink size={15} />
+                        <ExternalLink size={13} />
+                        <span>{lang === 'bn' ? 'মূল পত্রিকায় পড়ুন' : 'Read Full'}</span>
                       </a>
                       <button 
-                        className={`small-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                        className="read-btn secondary sm"
+                        onClick={() => onOpenModal(story)}
+                      >
+                        <Eye size={13} />
+                        <span>{lang === 'bn' ? 'প্রিভিউ' : 'Preview'}</span>
+                      </button>
+                    </div>
+
+                    <div className="action-icon-group">
+                      <button 
+                        className={`small-icon-btn sm ${isBookmarked ? 'bookmarked' : ''}`}
                         onClick={() => onToggleBookmark(story)}
                         title={isBookmarked ? 'Bookmarked' : 'Bookmark'}
                       >
-                        <Bookmark size={15} />
+                        <Bookmark size={14} />
                       </button>
                       <button 
-                        className="small-icon-btn"
+                        className="small-icon-btn sm"
                         onClick={() => onShare(story)}
                         title="Share"
                       >
-                        <Share2 size={15} />
+                        <Share2 size={14} />
                       </button>
                     </div>
                   </div>

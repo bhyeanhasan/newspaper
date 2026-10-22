@@ -37,14 +37,6 @@ export default function NewsModal({
           <X size={20} />
         </button>
 
-        {news.imageUrl && (
-          <img 
-            src={news.imageUrl} 
-            alt={title}
-            className="modal-cover-img"
-          />
-        )}
-
         <div className="modal-body">
           <div className="meta-row">
             <span className="source-pill" style={{ color: 'var(--accent-red)', fontWeight: 700 }}>
