@@ -12,11 +12,11 @@ function newsFeedPlugin() {
           let feedUrl = '';
 
           if (type === 'bd') {
-            // Google News RSS for Bangladesh with Bengali headlines from Prothom Alo, Daily Star, BDNews24, etc.
-            feedUrl = 'https://news.google.com/rss/search?q=%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE%E0%A6%A6%E0%A7%87%E0%A6%B6&hl=bn&gl=BD&ceid=BD:bn';
+            // Google News RSS Top Headlines for Bangladesh in Bengali
+            feedUrl = 'https://news.google.com/rss?hl=bn&gl=BD&ceid=BD:bn';
           } else if (type === 'bd-en') {
-            // English language news from Bangladesh
-            feedUrl = 'https://news.google.com/rss/search?q=Bangladesh+news&hl=en-US&gl=US&ceid=US:en';
+            // English language top headlines for Bangladesh
+            feedUrl = 'https://news.google.com/rss?hl=en&gl=BD&ceid=BD:en';
           } else {
             // BBC World News / Global International headlines
             feedUrl = 'https://feeds.bbci.co.uk/news/world/rss.xml';

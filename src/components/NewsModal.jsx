@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X, ExternalLink, Bookmark, Share2, Clock, Globe, ShieldCheck } from 'lucide-react';
+import { formatTimeAgo } from '../services/newsService';
 
 export default function NewsModal({ 
   news, 
@@ -51,7 +52,7 @@ export default function NewsModal({
             </span>
             <span className="utility-item">
               <Clock size={13} />
-              {news.time}
+              {news.pubDate ? formatTimeAgo(news.pubDate, lang) : (lang === 'bn' ? (news.time || 'সম্প্রতি') : (news.timeEn || news.time || 'Recently'))}
             </span>
             <span>• {news.readTime}</span>
             <span className="category-tag">

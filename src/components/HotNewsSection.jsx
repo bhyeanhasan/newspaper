@@ -10,6 +10,7 @@ import {
   Radio,
   Sparkles
 } from 'lucide-react';
+import { formatTimeAgo } from '../services/newsService';
 
 export default function HotNewsSection({ 
   bdHotNews, 
@@ -59,6 +60,13 @@ export default function HotNewsSection({
 
   const leadStory = combinedNews.length > 0 ? combinedNews[0] : null;
   const otherStories = combinedNews.length > 1 ? combinedNews.slice(1) : [];
+
+  const getTimeDisplay = (story) => {
+    if (story?.pubDate) {
+      return formatTimeAgo(story.pubDate, lang);
+    }
+    return lang === 'bn' ? (story?.time || 'সম্প্রতি') : (story?.timeEn || story?.time || 'Recently');
+  };
 
   const categories = [
     { id: 'all', labelBn: 'সকল ক্যাটাগরি', labelEn: 'All Categories' },
@@ -199,7 +207,7 @@ export default function HotNewsSection({
                     </span>
                     <span className="utility-item">
                       <Clock size={13} />
-                      {lang === 'bn' ? (leadStory.time || 'সম্প্রতি') : (leadStory.timeEn || leadStory.time || 'Recently')}
+                      {getTimeDisplay(leadStory)}
                     </span>
                     <span>• {leadStory.readTime || '3 min read'}</span>
                     <span style={{ marginLeft: 'auto', fontWeight: 600, color: leadStory.region === 'bd' ? '#059669' : '#2563eb' }}>
@@ -267,7 +275,7 @@ export default function HotNewsSection({
             const title = lang === 'bn' ? story.title : (story.titleEn || story.title);
             const summary = lang === 'bn' ? story.summary : (story.summaryEn || story.summary);
             const source = lang === 'bn' ? story.source : (story.sourceEn || story.source);
-            const timeAgo = lang === 'bn' ? (story.time || 'সম্প্রতি') : (story.timeEn || story.time || 'Recently');
+            const timeAgo = getTimeDisplay(story);
 
             return (
               <article key={story.id} className="hot-news-card">

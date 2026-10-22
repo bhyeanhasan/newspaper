@@ -6,10 +6,11 @@
   "homepage": "https://bhyeanhasan.github.io/newspaper",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/updateNews.js",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "predeploy": "npm run build && cp -r dist docs",
+    "predeploy": "npm run build && rm -rf docs && cp -r dist docs",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
