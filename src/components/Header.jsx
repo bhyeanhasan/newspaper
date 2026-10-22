@@ -114,9 +114,9 @@ export default function Header({
                 <Newspaper size={26} strokeWidth={2.2} />
               </div>
               <div>
-                <div className="brand-title">
+                <h1 className="brand-title" title="KhabarHub - সব বাংলা সংবাদপত্র ও লাইভ তাজা খবর">
                   Khabar<span>Hub</span>
-                </div>
+                </h1>
                 <div className="brand-subtitle">
                   {lang === 'bn' 
                     ? 'জাতীয়, ইংরেজি ও আন্তর্জাতিক সংবাদ মাধ্যম' 

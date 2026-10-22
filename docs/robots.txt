@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://bhyeanhasan.github.io/newspaper/
+
+# Sitemap
+Sitemap: https://bhyeanhasan.github.io/newspaper/sitemap.xml
